@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS Obfuscator — thabhadrika</title>
+  <script src="https://cdn.jsdelivr.net/npm/javascript-obfuscator/dist/index.browser.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background -->
+  <canvas id="bgCanvas"></canvas>
+  <div class="noise"></div>
+
+  <!-- Offline -->
+  <div class="offline-overlay" id="offlineOverlay">
+    <div class="offline-icon-wrap">
+      <i class="fas fa-wifi-slash"></i>
+    </div>
+    <h2>Tidak Ada Koneksi</h2>
+    <p>Aktifkan internet untuk menggunakan JS Obfuscator.</p>
+    <button class="retry-btn" onclick="location.reload()">
+      <i class="fas fa-rotate-right"></i> Coba Lagi
+    </button>
+  </div>
+
+  <!-- Toast Stack -->
+  <div class="toast-stack" id="toastStack"></div>
+
+  <div class="wrapper">
+
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-mark">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <div class="brand-info">
+          <h1>JS Obfuscator</h1>
+          <p>Code Protection Tool</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-badge">
+          <i class="fas fa-lock"></i>
+          Proteksi kode JavaScript kamu
+        </div>
+        <h2>Obfuskasi Kode<br><span>Tanpa Batas</span></h2>
+        <p>Lindungi source code JavaScript kamu dari reverse engineering dengan teknologi obfuskasi tingkat lanjut.</p>
+      </div>
+
+      <!-- Editor Grid -->
+      <div class="editor-grid">
+
+        <!-- Input Panel -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-label">
+              <i class="fas fa-code"></i>
+              Kode Original
+            </div>
+            <div class="panel-acts">
+              <button id="loadSampleBtn" class="act-btn accent">
+                <i class="fas fa-file-code"></i> Contoh
+              </button>
+              <button id="clearInputBtn" class="act-btn danger">
+                <i class="fas fa-trash"></i> Hapus
+              </button>
+            </div>
+          </div>
+          <textarea id="inputCode" class="code-area" placeholder="// Masukkan kode JavaScript kamu di sini...&#10;&#10;function greet(name) {&#10;    return 'Hello, ' + name + '!';&#10;}&#10;&#10;console.log(greet('World'));"></textarea>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-label">
+              <i class="fas fa-lock"></i>
+              Kode Terobfuskasi
+            </div>
+            <div class="panel-acts">
+              <span id="outputStatus" class="output-status ready">
+                <i class="fas fa-circle"></i> Siap
+              </span>
+              <button id="copyBtn" class="act-btn accent" disabled>
+                <i class="fas fa-copy"></i> Salin
+              </button>
+            </div>
+          </div>
+          <textarea id="outputCode" class="code-area output-area" placeholder="// Hasil obfuskasi tampil di sini..." readonly></textarea>
+        </div>
+
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <div class="controls-inner">
+
+          <!-- Level Section -->
+          <div class="ctrl-section">
+            <div class="ctrl-title"><i class="fas fa-sliders"></i> Tingkat Obfuskasi</div>
+            <div class="level-tabs">
+              <div class="level-tab">
+                <input type="radio" id="lvBasic" name="lvl" value="basic" checked>
+                <label for="lvBasic">
+                  <div class="level-ico"><i class="fas fa-shield"></i></div>
+                  <div class="level-info">
+                    <strong>Minimal</strong>
+                    <small>Cepat &amp; ringan</small>
+                  </div>
+                </label>
+              </div>
+              <div class="level-tab">
+                <input type="radio" id="lvMedium" name="lvl" value="medium">
+                <label for="lvMedium">
+                  <div class="level-ico"><i class="fas fa-shield-halved"></i></div>
+                  <div class="level-info">
+                    <strong>Menengah</strong>
+                    <small>Seimbang</small>
+                  </div>
+                </label>
+              </div>
+              <div class="level-tab">
+                <input type="radio" id="lvComplex" name="lvl" value="complex">
+                <label for="lvComplex">
+                  <div class="level-ico"><i class="fas fa-shield-virus"></i></div>
+                  <div class="level-info">
+                    <strong>Kompleks</strong>
+                    <small>Keamanan maksimal</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Section -->
+          <div class="ctrl-section">
+            <div class="ctrl-title"><i class="fas fa-cog"></i> Opsi Lanjutan</div>
+            <button id="advToggleBtn" class="adv-toggle">
+              <i class="fas fa-sliders-h"></i>
+              <span>Tampilkan opsi lanjutan</span>
+              <i class="fas fa-chevron-down chev"></i>
+            </button>
+            <div id="advOptions" class="adv-options">
+              <div class="opt-row">
+                <div class="opt-icon"><i class="fas fa-globe"></i></div>
+                <label class="opt-label" for="optGlobal">Ubah nama variabel global</label>
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="optGlobal">
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+              <div class="opt-row">
+                <div class="opt-icon"><i class="fas fa-skull-crossbones"></i></div>
+                <label class="opt-label" for="optDead">Sisipkan kode mati (dead code)</label>
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="optDead">
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+              <div class="opt-row">
+                <div class="opt-icon"><i class="fas fa-bug-slash"></i></div>
+                <label class="opt-label" for="optDebug">Proteksi dari debug</label>
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="optDebug">
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+              <div class="opt-row">
+                <div class="opt-icon"><i class="fas fa-user-shield"></i></div>
+                <label class="opt-label" for="optSelf">Self-defending code</label>
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="optSelf">
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Obfuscate Button -->
+            <button id="obfuscateBtn" class="submit-btn">
+              <span class="btn-shimmer"></span>
+              <i class="fas fa-wand-magic-sparkles"></i>
+              <span>Obfuskasi Sekarang</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Info Grid -->
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-card-icon"><i class="fas fa-shield"></i></div>
+            <strong>Minimal</strong>
+            <p>Hapus komentar &amp; spasi, ubah nama variabel dasar. Hasil ringan dan eksekusi cepat.</p>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon"><i class="fas fa-shield-halved"></i></div>
+            <strong>Menengah</strong>
+            <p>Enkripsi string + transformasi alur kontrol. Keseimbangan antara keamanan &amp; performa.</p>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon"><i class="fas fa-shield-virus"></i></div>
+            <strong>Kompleks</strong>
+            <p>Transformasi lanjutan penuh. Keamanan maksimal, bisa memperlambat sedikit eksekusi.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-brand">
+        <i class="fas fa-shield-halved"></i>
+        <span>JS Obfuscator &copy; 2026</span>
+      </div>
+      <div class="dev-badge">
+        <span class="dev-name">Dev by <strong>thabhadrika</strong></span>
+        <a href="https://wa.me/17423768814" target="_blank" class="wa-btn">
+          <i class="fab fa-whatsapp"></i>
+          Hubungi Dev
+        </a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
